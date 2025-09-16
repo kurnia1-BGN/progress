@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid-active</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #f4f4f4;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        header {
+            background-color: navy;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .reset-container {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .reset-button {
+            padding: 8px 16px;
+            font-size: 16px;
+            border: none;
+            background-color: crimson;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .reset-button:hover {
+            background-color: darkred;
+        }
+
+        .grid-active {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 24px;
+            padding: 20px;
+        }
+
+        .card-active {
+            position: relative;
+            background-color: white;
+            border: 2px solid black;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            overflow: hidden;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .scanner {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 128, 255, 0.3);
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: navy;
+            pointer-events: none;
+        }
+
+        .scanner-text {
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h2>作成者：Kurnia1</h2>
+    </header>
+
+    <!-- Tombol reset -->
+    <div class="reset-container">
+        <button class="reset-button" id="resetClick">Reset Klik</button>
+    </div>
+
+    <div class="grid-active">
+        <div class="card-active">
+            <h2>牛丼　並</h2>
+            <h2>つゆだく</h2>
+        </div>
+        <div class="card-active">
+            <h2>鮭定食　大</h2>
+            <h2>牛皿定食　並</h2>
+        </div>
+        <div class="card-active">
+            <h2>牛丼　大</h2>
+        </div>
+        <div class="card-active">
+            <h2>鍋定食　並</h2>
+        </div>
+        <div class="card-active">
+            <h2>さば定食　並</h2>
+        </div>
+    </div>
+
+    <script>
+        let totalClicks = 0;
+        let lastClickedCard = null;
+
+        document.querySelectorAll('.card-active').forEach(card => {
+            card.addEventListener('click', () => {
+                // Jangan jalankan animasi jika sedang berlangsung di card ini
+                if (card.querySelector('.scanner')) return;
+
+                // Tambah klik hanya jika kartu yang diklik berbeda
+                if (lastClickedCard !== card) {
+                    totalClicks++;
+                    lastClickedCard = card;
+                }
+
+                const scanner = document.createElement('div');
+                scanner.className = 'scanner';
+                scanner.style.height = '0%';
+
+                const scannerText = document.createElement('div');
+                scannerText.className = 'scanner-text';
+                scannerText.textContent = '1%';
+                scanner.appendChild(scannerText);
+                card.appendChild(scanner);
+
+                const baseDuration = 1000;
+                const extraPerClick = 300;
+                const duration = baseDuration + (totalClicks * extraPerClick);
+
+                const interval = 20;
+                const steps = duration / interval;
+                const increment = 100 / steps;
+                let percent = 1;
+
+                const timer = setInterval(() => {
+                    if (percent >= 100) {
+                        percent = 100;
+                        scanner.style.height = '100%';
+                        scannerText.textContent = '100%';
+                        clearInterval(timer);
+                        setTimeout(() => {
+                            scanner.remove();
+                        }, 500);
+                    } else {
+                        scanner.style.height = `${percent}%`;
+                        scannerText.textContent = `${Math.floor(percent)}%`;
+                        percent += increment;
+                    }
+                }, interval);
+            });
+        });
+
+        // Tombol reset klik
+        document.getElementById('resetClick').addEventListener('click', () => {
+            totalClicks = 0;
+            lastClickedCard = null;
+            alert('Jumlah klik telah di-reset!');
+        });
+    </script>
+</body>
+</html>
